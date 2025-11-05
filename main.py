@@ -29,16 +29,26 @@ class ExpertSystemApp(QMainWindow):
         self.current_eixo_index = 0
         self.current_question_index = 0
         self.score = 0
+        self.total_questions = sum(
+            len(eixo["perguntas"]) for eixo in self.questions_data["eixos"]
+        )
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        self.progress_label = QLabel(self)
+        self.progress_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.progress_label.setStyleSheet("font-size: 12px;")
+
         self.question_label = QLabel(self)
         self.question_label.setWordWrap(True)
         self.question_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.question_label.setStyleSheet("font-size: 16px; margin: 20px;")
+
+        self.layout.addWidget(self.progress_label)
+        self.layout.addWidget(self.question_label)
 
         self.buttons_layout = QHBoxLayout()
         self.yes_button = QPushButton("Sim")
@@ -52,7 +62,6 @@ class ExpertSystemApp(QMainWindow):
         self.buttons_layout.addWidget(self.yes_button)
         self.buttons_layout.addWidget(self.no_button)
 
-        self.layout.addWidget(self.question_label)
         self.layout.addLayout(self.buttons_layout)
 
         self.start_quiz()
@@ -81,6 +90,17 @@ class ExpertSystemApp(QMainWindow):
         self.setWindowTitle(eixo["nome"])
         if self.current_question_index < len(eixo["perguntas"]):
             question = eixo["perguntas"][self.current_question_index]
+            current_question_number = (
+                sum(
+                    len(self.questions_data["eixos"][i]["perguntas"])
+                    for i in range(self.current_eixo_index)
+                )
+                + self.current_question_index
+                + 1
+            )
+            self.progress_label.setText(
+                f"Pergunta {current_question_number} de {self.total_questions}"
+            )
             self.question_label.setText(question["texto"])
         else:
             self.show_results()
@@ -93,7 +113,16 @@ class ExpertSystemApp(QMainWindow):
             self.score += question["peso"]
 
         self.current_question_index += 1
-        self.display_question()
+
+        if self.current_question_index < len(eixo["perguntas"]):
+            self.display_question()
+        else:
+            self.current_eixo_index += 1
+            self.current_question_index = 0
+            if self.current_eixo_index < len(self.questions_data["eixos"]):
+                self.display_question()
+            else:
+                self.show_results()
 
     def get_risk_level(self):
         if self.score <= 10:
