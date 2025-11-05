@@ -1,0 +1,29 @@
+{
+  "eixos": [
+    {
+      "nome": "Eixo 1 — Comportamento Alimentar",
+      "perguntas": [
+        {
+          "id": 1,
+          "texto": "Você evita comer em público por vergonha do que as pessoas podem pensar?",
+          "peso": 2
+        },
+        {
+          "id": 2,
+          "texto": "Você costuma pular refeições para “compensar” o que comeu antes?",
+          "peso": 3
+        },
+        {
+          "id": 3,
+          "texto": "Você sente que perdeu o controle ao comer, mesmo quando não está com fome?",
+          "peso": 3
+        },
+        {
+          "id": 4,
+          "texto": "Você já se sentiu compelido(a) a se exercitar logo depois de comer?",
+          "peso": 3
+        }
+      ]
+    }
+  ]
+}
