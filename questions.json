@@ -6,22 +6,119 @@
         {
           "id": 1,
           "texto": "Você evita comer em público por vergonha do que as pessoas podem pensar?",
-          "peso": 2
+          "peso": 2,
+          "justificativa": "Vergonha social e medo de julgamento. Indica evitação social relacionada à alimentação; sugere início de ansiedade social associada a imagem corporal."
         },
         {
           "id": 2,
           "texto": "Você costuma pular refeições para “compensar” o que comeu antes?",
-          "peso": 3
+          "peso": 3,
+          "justificativa": "Restrição e compensação. Mostra comportamento compensatório, associado a anorexia e bulimia; alto valor clínico."
         },
         {
           "id": 3,
           "texto": "Você sente que perdeu o controle ao comer, mesmo quando não está com fome?",
-          "peso": 3
+          "peso": 3,
+          "justificativa": "Impulsividade e perda de controle. Indica compulsão alimentar; sintoma central de bulimia e transtorno de compulsão alimentar periódica."
         },
         {
           "id": 4,
           "texto": "Você já se sentiu compelido(a) a se exercitar logo depois de comer?",
-          "peso": 3
+          "peso": 3,
+          "justificativa": "Culpa e comportamento compensatório. Indício de ciclo compensatório, tentativa de “anular” a comida; alto risco clínico."
+        }
+      ]
+    },
+    {
+      "nome": "Eixo 2 — Imagem Corporal",
+      "perguntas": [
+        {
+          "id": 5,
+          "texto": "Você acredita que seu valor como pessoa depende de seu peso ou aparência?",
+          "peso": 3,
+          "justificativa": "Autoestima e valor pessoal. Núcleo identitário do transtorno; autoimagem fundida com valor moral e aceitação."
+        },
+        {
+          "id": 6,
+          "texto": "Você sente que ser magro(a) ou ter certo corpo faria você ser mais aceito(a) ou respeitado(a)?",
+          "peso": 3,
+          "justificativa": "Validação social e ideal corporal. Demonstra internalização de padrões de beleza e busca de pertencimento via aparência."
+        },
+        {
+          "id": 7,
+          "texto": "Você já deixou de participar de algo (fotos, encontros, festas) por vergonha do seu corpo?",
+          "peso": 2,
+          "justificativa": "Isolamento e vergonha corporal. Indica prejuízo funcional e sofrimento social; relevante, mas não determinante isoladamente."
+        },
+        {
+          "id": 8,
+          "texto": "Você sente que precisa “merecer” comer ou descansar?",
+          "peso": 3,
+          "justificativa": "Culpa moral e auto-punição. Mostra relação moralizada com o corpo e a comida; comportamento de autopunição recorrente em transtornos alimentares."
+        }
+      ]
+    },
+    {
+      "nome": "Eixo 3 — Emoção e Autoconceito",
+      "perguntas": [
+        {
+          "id": 9,
+          "texto": "Você sente culpa ou vergonha depois de comer?",
+          "peso": 3,
+          "justificativa": "Culpa e vergonha alimentar. Emoções sobre si negativas; indicam internalização de regras rígidas e autojulgamento."
+        },
+        {
+          "id": 10,
+          "texto": "Você come (ou deixa de comer) quando está ansioso(a), triste ou irritado(a)?",
+          "peso": 2,
+          "justificativa": "Regulação emocional pela comida. Uso emocional da alimentação, mas ainda não disfuncional por si só."
+        },
+        {
+          "id": 11,
+          "texto": "A comida às vezes te traz alívio ou sensação de segurança?",
+          "peso": 2,
+          "justificativa": "Associação comida– conforto. Indica função emocional compensatória; fator de risco intermediário."
+        },
+        {
+          "id": 12,
+          "texto": "Você sente que comer é uma forma de se acalmar?",
+          "peso": 3,
+          "justificativa": "Autocontrole e regulação emocional. Indica possível dependência emocional da alimentação para estabilizar afetos; forte marcador psicológico."
+        }
+      ]
+    },
+    {
+      "nome": "Eixo 4 — Controle e Rotina",
+      "perguntas": [
+        {
+          "id": 13,
+          "texto": "Você sente ansiedade se sua rotina alimentar muda?",
+          "peso": 2,
+          "justificativa": "Ansiedade e rigidez cognitiva. Indica rigidez comportamental e dificuldade de adaptação; fator de manutenção de transtornos."
+        },
+        {
+          "id": 14,
+          "texto": "Você já evitou sair ou participar de eventos por medo de perder o controle sobre o que vai comer?",
+          "peso": 3,
+          "justificativa": "Medo de descontrole e isolamento. Demonstra restrição por medo e prejuízo social; marcador de progressão clínica."
+        },
+        {
+          "id": 15,
+          "texto": "Você sente que precisa seguir regras rígidas sobre o que pode ou não comer?",
+          "peso": 3,
+          "justificativa": "Controle e perfeccionismo. Indício de pensamento dicotômico (“permitido x proibido”); forte ligação com anorexia e ortorexia."
+        },
+        {
+          "id": 16,
+          "texto": "Você sente culpa quando “sai da dieta”, mesmo que seja algo pequeno?",
+          "peso": 3,
+          "justificativa": "Culpa e autoavaliação rígida. Expressa moralização e autocondenação; elemento central em distúrbios de restrição."
+        },
+        {
+          "id": 17,
+          "texto": "Você se sente ansioso(a) se não consegue controlar a própria alimentação?",
+          "peso": 3,
+          "justificativa": "Ansiedade de controle. Manifesta dependência de controle alimentar; sintoma transversal em quadros restritivos e compulsivos."
         }
       ]
     }

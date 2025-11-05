@@ -1,1 +1,27 @@
+# PyInstaller / build artifacts
+dist/
+build/
+*.spec
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Editor/temp
+.vscode/
+.idea/
+*.log
+*.tmp
+Thumbs.db
+.DS_Store
+
+# Executables
+*.exe
+
 .vscode/
