@@ -3,17 +3,14 @@
 ## 📋 Descrição do Projeto
 Este repositório contém a aplicação em Python e uma versão leve para Windows (`main_windows_tk.py`) que usa Tkinter (módulo da stdlib) — ideal para gerar um executável menor com PyInstaller.
 
-Um sistema especialista em Python que realiza uma avaliação de risco baseada em critérios do DSM-5 (Manual Diagnóstico e Estatístico de Transtornos Mentais). O sistema utiliza perguntas binárias ("Sim" ou "Não") para avaliar comportamentos relacionados a transtornos alimentares em quatro eixos distintos:Arquivos importantes:
+Um sistema especialista em Python que realiza uma avaliação de risco baseada em critérios do DSM-5 (Manual Diagnóstico e Estatístico de Transtornos Mentais). O sistema utiliza perguntas binárias (“Sim” ou “Não”) para avaliar comportamentos relacionados a **transtornos alimentares** em quatro eixos distintos:
 
-- **Eixo 1**: Comportamento Alimentar (4 perguntas)- `main.py` — versão original (Linux/Qt).
+- **Eixo 1:** Comportamento Alimentar (4 perguntas)  
+- **Eixo 2:** Imagem Corporal (4 perguntas)  
+- **Eixo 3:** Emoção e Autoconceito (4 perguntas)  
+- **Eixo 4:** Controle e Rotina (5 perguntas)
 
-- **Eixo 2**: Imagem Corporal (4 perguntas)- `main_windows_tk.py` — entrypoint leve (Tkinter) para Windows.
-
-- **Eixo 3**: Emoção e Autoconceito (4 perguntas)- `questions.json` — dados usados pela aplicação.
-
-- **Eixo 4**: Controle e Rotina (5 perguntas)- `.gitignore` — já configurado para ignorar `dist/`, `build/`, `*.spec` e `*.exe`.
-
-**Total**: 17 perguntas com pontuação progressiva e classificação automática de risco.Como gerar o .exe (passos mínimos, executar em Windows):
+**Total:** 17 perguntas, com pontuação progressiva e classificação automática de risco.
 
 ### ✨ Funcionalidades Principais1. Abra PowerShell ou cmd.exe (NO WINDOWS, não use WSL para gerar o .exe Windows).
 
@@ -188,4 +185,5 @@ Para dúvidas ou reportar problemas, entre em contato através dos canais oficia
 **Versão**: 1.0  
 **Última atualização**: Novembro de 2025  
 **Plataforma**: Windows
+
 
