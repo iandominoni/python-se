@@ -1,6 +1,7 @@
 # Sistema Especialista de Avaliação de Risco - DSM-5# Sistema Especialista — build do executável (Windows)
 
-## 📋 Descrição do ProjetoEste repositório contém a aplicação em Python e uma versão leve para Windows (`main_windows_tk.py`) que usa Tkinter (módulo da stdlib) — ideal para gerar um executável menor com PyInstaller.
+## 📋 Descrição do Projeto
+Este repositório contém a aplicação em Python e uma versão leve para Windows (`main_windows_tk.py`) que usa Tkinter (módulo da stdlib) — ideal para gerar um executável menor com PyInstaller.
 
 Um sistema especialista em Python que realiza uma avaliação de risco baseada em critérios do DSM-5 (Manual Diagnóstico e Estatístico de Transtornos Mentais). O sistema utiliza perguntas binárias ("Sim" ou "Não") para avaliar comportamentos relacionados a transtornos alimentares em quatro eixos distintos:Arquivos importantes:
 
@@ -187,3 +188,4 @@ Para dúvidas ou reportar problemas, entre em contato através dos canais oficia
 **Versão**: 1.0  
 **Última atualização**: Novembro de 2025  
 **Plataforma**: Windows
+
