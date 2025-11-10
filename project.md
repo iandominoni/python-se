@@ -1,5 +1,6 @@
 # 🏥 Sistema de Avaliação de Risco - DSM-5# 🏥 Sistema de Avaliação de Risco - DSM-5# Sistema Especialista de Avaliação de Risco - DSM-5
 
+-instalar no windows pyinstaller --onefile --windowed --exclude-module=numpy --exclude-module=pandas --exclude-module=scipy --exclude-module=matplotlib --add-data "questions.json;." main.py
 Sistema de triagem para avaliação de risco de transtornos alimentares baseado em critérios do DSM-5 com interface moderna multiplataforma.Sistema de triagem para avaliação de risco de transtornos alimentares baseado em critérios do DSM-5 com interface moderna multiplataforma.## 📋 Descrição do Projeto
 
 ## 📋 Sobre o Projeto## 📋 Sobre o ProjetoUm sistema especialista em Python que realiza uma avaliação de risco baseada em critérios do DSM-5 (Manual Diagnóstico e Estatístico de Transtornos Mentais). O sistema utiliza perguntas binárias ("Sim" ou "Não") para avaliar comportamentos relacionados a transtornos alimentares em quatro eixos distintos:
