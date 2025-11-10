@@ -451,7 +451,10 @@ Comportamento • Imagem • Emoção • Controle • Percepção"""
 
         # Nota
         note_label = QLabel(
-            "⚠ Ferramenta de triagem educacional.\nNão substitui avaliação clínica profissional."
+            "⚠ AVISO IMPORTANTE\n\n"
+            "A pontuação final é uma estatística de triagem e pode ter variações significativas.\n"
+            "A interpretação clínica deve sempre considerar idade, sexo (masculino/feminino)\n"
+            "e histórico individual, não substituindo a avaliação de um profissional de saúde."
         )
         note_label.setFont(QFont("Ubuntu", 8))
         note_label.setStyleSheet(f"color: #E74C3C; background-color: {PRIMARY_COLOR};")
