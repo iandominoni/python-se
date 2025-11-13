@@ -1138,5 +1138,233 @@
         "pontos": 1
       }
     ]
+  },
+  {
+    "patient_name": "Anônimo",
+    "data": "13/11/2025 13:44",
+    "level": "Alto",
+    "score": 44,
+    "responses": [
+      {
+        "eixo_index": 0,
+        "question_index": 0,
+        "question_id": 1,
+        "eixo_nome": "Eixo 1 — Comportamento Alimentar",
+        "pergunta_texto": "O paciente evita comer em público por vergonha do que as pessoas podem pensar?",
+        "justificativa": "Vergonha social e medo de julgamento. Indica evitação social relacionada à alimentação.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 0,
+        "question_index": 1,
+        "question_id": 2,
+        "eixo_nome": "Eixo 1 — Comportamento Alimentar",
+        "pergunta_texto": "O paciente costuma pular refeições para compensar o que comeu antes?",
+        "justificativa": "Restrição e compensação. Mostra comportamento compensatório, associado a anorexia e bulimia.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 0,
+        "question_index": 2,
+        "question_id": 3,
+        "eixo_nome": "Eixo 1 — Comportamento Alimentar",
+        "pergunta_texto": "O paciente sente que perdeu o controle ao comer, mesmo quando não está com fome?",
+        "justificativa": "Impulsividade e perda de controle. Indica compulsão alimentar.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 0,
+        "question_index": 3,
+        "question_id": 4,
+        "eixo_nome": "Eixo 1 — Comportamento Alimentar",
+        "pergunta_texto": "O paciente já se sentiu compelido(a) a se exercitar logo depois de comer?",
+        "justificativa": "Culpa e comportamento compensatório. Indício de ciclo compensatório.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 1,
+        "question_index": 0,
+        "question_id": 5,
+        "eixo_nome": "Eixo 2 — Imagem Corporal",
+        "pergunta_texto": "O paciente acredita que seu valor como pessoa depende de seu peso ou aparência?",
+        "justificativa": "Autoestima e valor pessoal. Núcleo identitário do transtorno.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 1,
+        "question_index": 1,
+        "question_id": 6,
+        "eixo_nome": "Eixo 2 — Imagem Corporal",
+        "pergunta_texto": "O paciente sente que ser magro(a) ou ter certo corpo faria com que ele(a) fosse mais aceito(a) ou respeitado(a)?",
+        "justificativa": "Validação social e ideal corporal. Demonstra internalização de padrões de beleza.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 1,
+        "question_index": 2,
+        "question_id": 7,
+        "eixo_nome": "Eixo 2 — Imagem Corporal",
+        "pergunta_texto": "O paciente já deixou de participar de algo (fotos, encontros, festas) por vergonha do próprio corpo?",
+        "justificativa": "Isolamento e vergonha corporal. Indica prejuízo funcional e sofrimento social.",
+        "resposta": "sim",
+        "pontos": 2
+      },
+      {
+        "eixo_index": 1,
+        "question_index": 3,
+        "question_id": 8,
+        "eixo_nome": "Eixo 2 — Imagem Corporal",
+        "pergunta_texto": "O paciente sente que precisa merecer comer ou descansar?",
+        "justificativa": "Culpa moral e auto-punição. Relação moralizada com o corpo e a comida.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 2,
+        "question_index": 0,
+        "question_id": 9,
+        "eixo_nome": "Eixo 3 — Emoção e Autoconceito",
+        "pergunta_texto": "O paciente sente culpa ou vergonha depois de comer?",
+        "justificativa": "Culpa e vergonha alimentar. Indicam internalização de regras rígidas.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 2,
+        "question_index": 1,
+        "question_id": 10,
+        "eixo_nome": "Eixo 3 — Emoção e Autoconceito",
+        "pergunta_texto": "O paciente come (ou deixa de comer) quando está ansioso(a), triste ou irritado(a)?",
+        "justificativa": "Regulação emocional pela comida. Uso emocional da alimentação.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 2,
+        "question_index": 2,
+        "question_id": 11,
+        "eixo_nome": "Eixo 3 — Emoção e Autoconceito",
+        "pergunta_texto": "A comida às vezes traz ao paciente alívio ou sensação de segurança?",
+        "justificativa": "Associação comida-conforto. Indica função emocional compensatória.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 2,
+        "question_index": 3,
+        "question_id": 12,
+        "eixo_nome": "Eixo 3 — Emoção e Autoconceito",
+        "pergunta_texto": "O paciente sente que comer é uma forma de se acalmar?",
+        "justificativa": "Autocontrole e regulação emocional. Dependência emocional da alimentação.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 3,
+        "question_index": 0,
+        "question_id": 13,
+        "eixo_nome": "Eixo 4 — Controle e Rotina",
+        "pergunta_texto": "O paciente sente ansiedade se sua rotina alimentar muda?",
+        "justificativa": "Ansiedade e rigidez cognitiva. Rigidez comportamental e dificuldade de adaptação.",
+        "resposta": "sim",
+        "pontos": 2
+      },
+      {
+        "eixo_index": 3,
+        "question_index": 1,
+        "question_id": 14,
+        "eixo_nome": "Eixo 4 — Controle e Rotina",
+        "pergunta_texto": "O paciente já evitou sair ou participar de eventos por medo de perder o controle sobre o que vai comer?",
+        "justificativa": "Medo de descontrole e isolamento. Restrição por medo e prejuízo social.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 3,
+        "question_index": 2,
+        "question_id": 15,
+        "eixo_nome": "Eixo 4 — Controle e Rotina",
+        "pergunta_texto": "O paciente sente que precisa seguir regras rígidas sobre o que pode ou não comer?",
+        "justificativa": "Controle e perfeccionismo. Pensamento dicotômico.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 3,
+        "question_index": 3,
+        "question_id": 16,
+        "eixo_nome": "Eixo 4 — Controle e Rotina",
+        "pergunta_texto": "O paciente sente culpa quando sai da dieta, mesmo que seja algo pequeno?",
+        "justificativa": "Culpa e autoavaliação rígida. Moralização e autocondenação.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 3,
+        "question_index": 4,
+        "question_id": 17,
+        "eixo_nome": "Eixo 4 — Controle e Rotina",
+        "pergunta_texto": "O paciente se sente ansioso(a) se não consegue controlar a própria alimentação?",
+        "justificativa": "Ansiedade de controle. Dependência de controle alimentar.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 4,
+        "question_index": 0,
+        "question_id": 18,
+        "eixo_nome": "Eixo 5 — Percepção do Problema",
+        "pergunta_texto": "O paciente está ciente de que seu modo de se alimentar pode prejudicar sua saúde? (Caso não prejudique, apertar sim também)",
+        "justificativa": "Insight e consciência do risco. Negação é fator mantedor.",
+        "resposta": "sim",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 4,
+        "question_index": 1,
+        "question_id": 19,
+        "eixo_nome": "Eixo 5 — Percepção do Problema",
+        "pergunta_texto": "Pessoas próximas já demonstraram preocupação com a forma do paciente se alimentar?",
+        "justificativa": "Impacto social e relacional. Comportamento perceptível para outros.",
+        "resposta": "nao",
+        "pontos": 1
+      },
+      {
+        "eixo_index": 4,
+        "question_index": 2,
+        "question_id": 20,
+        "eixo_nome": "Eixo 5 — Percepção do Problema",
+        "pergunta_texto": "O paciente sente medo de ganhar peso, mesmo sabendo que isso possa ser necessário?",
+        "justificativa": "Fobia de ganho de peso. Sintoma cardinal de anorexia.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 4,
+        "question_index": 3,
+        "question_id": 21,
+        "eixo_nome": "Eixo 5 — Percepção do Problema",
+        "pergunta_texto": "O paciente sente que os outros exagerem quando se preocupam com sua alimentação ou corpo apesar de apresentar sinais preocupantes? (Caso não tenha apresentado sinais, apertar não)",
+        "justificativa": "Minimização e distorção cognitiva. Fator de risco para não adesão.",
+        "resposta": "sim",
+        "pontos": 3
+      },
+      {
+        "eixo_index": 4,
+        "question_index": 4,
+        "question_id": 22,
+        "eixo_nome": "Eixo 5 — Percepção do Problema",
+        "pergunta_texto": "Alguém já sugeriu para o paciente que talvez sua relação com comida esteja causando sofrimento, e ele preferiu não pensar sobre isso? (Aperte não caso não apresente sofrimento)",
+        "justificativa": "Evitação e resistência ao reconhecimento. Falta de prontidão para mudança.",
+        "resposta": "nao",
+        "pontos": 1
+      }
+    ]
   }
 ]
