@@ -109,14 +109,45 @@ class QuestionManager:
 
 
 class HistoryManager:
-    """Gerencia o histórico de avaliações."""
+    """Gerencia o histórico de avaliações com cache em arquivo."""
 
     def __init__(self):
         self.history = []
+        self.cache_file = self._get_cache_path()
+        self._load_from_cache()
+
+    def _get_cache_path(self):
+        """Retorna o caminho do arquivo de cache."""
+        if getattr(sys, "frozen", False):
+            # Se for executável PyInstaller, salva no diretório do executável
+            base_path = os.path.dirname(sys.executable)
+        else:
+            # Modo desenvolvimento
+            base_path = os.path.dirname(os.path.abspath(__file__))
+
+        return os.path.join(base_path, "history_cache.json")
+
+    def _load_from_cache(self):
+        """Carrega o histórico do arquivo de cache."""
+        try:
+            if os.path.exists(self.cache_file):
+                with open(self.cache_file, "r", encoding="utf-8") as f:
+                    self.history = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.history = []
+
+    def _save_to_cache(self):
+        """Salva o histórico no arquivo de cache."""
+        try:
+            with open(self.cache_file, "w", encoding="utf-8") as f:
+                json.dump(self.history, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"Erro ao salvar cache: {e}")
 
     def add_assessment(self, assessment_data):
-        """Adiciona uma avaliação ao histórico."""
+        """Adiciona uma avaliação ao histórico e salva no cache."""
         self.history.append(assessment_data)
+        self._save_to_cache()
 
     def get_assessment(self, index):
         """Retorna uma avaliação específica."""
