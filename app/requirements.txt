@@ -1,8 +1,0 @@
-# Dependências para o Sistema Especialista - Versão Windows
-# Python 3.13.2+
-
-# PyInstaller para criar executável
-pyinstaller>=6.0.0
-
-# Tkinter já vem instalado com Python (não precisa instalar)
-# Bibliotecas padrão usadas: tkinter, datetime, json, os, pathlib
