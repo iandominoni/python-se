@@ -1,18 +1,32 @@
 # -*- mode: python ; coding: utf-8 -*-
-
+# PyInstaller spec para Sistema de Avaliação de Risco com PyQt6
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('questions.json', '.')],  # Incluir questions.json no executável
-    hiddenimports=['tkinter', 'tkinter.ttk'],
+    datas=[
+        ('questions.json', '.'),
+        ('history_cache.json', '.'),
+    ],
+    hiddenimports=[
+        'PyQt6.QtWidgets',
+        'PyQt6.QtCore',
+        'PyQt6.QtGui',
+        'reportlab',
+        'reportlab.lib',
+        'reportlab.lib.pagesizes',
+        'reportlab.lib.styles',
+        'reportlab.lib.units',
+        'reportlab.platypus',
+        'reportlab.pdfgen',
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
-    optimize=0,
+    optimize=2,
 )
 pyz = PYZ(a.pure)
 

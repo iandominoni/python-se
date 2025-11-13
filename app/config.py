@@ -2,30 +2,28 @@
 Módulo de configuração de cores e constantes - DESIGN PROFISSIONAL MODERNO.
 """
 
-# Paleta de cores profissional - Tema moderno e sofisticado
-PRIMARY_COLOR = "#1E293B"  # Slate 800 - Azul escuro elegante
-SECONDARY_COLOR = "#334155"  # Slate 700 - Azul acinzentado
-ACCENT_COLOR = "#475569"  # Slate 600 - Accent suave
-SUCCESS_COLOR = "#10B981"  # Verde esmeralda moderno
-WARNING_COLOR = "#F59E0B"  # Âmbar profissional
-DANGER_COLOR = "#EF4444"  # Vermelho coral
-LIGHT_BG = "#F1F5F9"  # Slate 100 - Cinza muito claro
-WHITE = "#FFFFFF"
-DARK_TEXT = "#0F172A"  # Slate 900
-PURPLE = "#8B5CF6"  # Roxo moderno
-PINK = "#EC4899"  # Rosa contemporâneo
-ORANGE = "#F97316"  # Laranja vibrante
-GREEN = "#059669"  # Verde profissional
-BLUE = "#3B82F6"  # Azul elétrico
-TEAL = "#14B8A6"  # Teal moderno
-INDIGO = "#6366F1"  # Indigo profissional
+# Paleta de cores profissional para área da saúde - WCAG 2.1 AA compliant
+# Baseada em estudos de psicologia das cores em ambientes médicos
+PRIMARY_COLOR = "#F8F9FA"  # Fundo principal - Cinza muito claro (neutro, calmo)
+SECONDARY_COLOR = "#0D7377"  # Azul-teal médico (confiança, profissionalismo)
+ACCENT_COLOR = "#14BDBE"  # Teal claro (tecnologia, modernidade)
+SUCCESS_COLOR = "#059669"  # Verde médico (saúde, positivo)
+WARNING_COLOR = "#D97706"  # Laranja médico (atenção, cuidado)
+DANGER_COLOR = "#DC2626"  # Vermelho médico (urgência, alerta)
+LIGHT_BG = "#FFFFFF"  # Fundo dos cards - Branco puro (clareza)
+WHITE = "#FFFFFF"  # Branco puro
+CARD_BG = "#FFFFFF"  # Fundo dos cards
+DARK_TEXT = "#1F2937"  # Texto principal (contraste 7:1)
+SECONDARY_TEXT = "#6B7280"  # Texto secundário (contraste 4.5:1)
+BORDER_COLOR = "#E5E7EB"  # Bordas suaves
+HOVER_BG = "#F3F4F6"  # Background hover sutil
 
-# Cores para níveis de risco - Design profissional
+# Cores para níveis de risco - Padrão médico internacional
 LEVEL_COLORS = {
-    "Baixo": "#10B981",  # Verde - Seguro
-    "Médio": "#F59E0B",  # Âmbar - Atenção
-    "Alto": "#F97316",  # Laranja - Alerta
-    "Crítico": "#EF4444",  # Vermelho - Crítico
+    "Baixo": "#059669",  # Verde médico - Estável
+    "Médio": "#D97706",  # Laranja médico - Observação
+    "Alto": "#DC2626",  # Vermelho médico - Atenção
+    "Crítico": "#991B1B",  # Vermelho escuro - Crítico
 }
 
 # Ícones profissionais (Unicode)
@@ -61,13 +59,13 @@ MOTIVATIONAL_MESSAGES = [
     "Excelente foco",
 ]
 
-# Cores dos eixos temáticos - Professional palette
+# Cores dos eixos temáticos - Diferenciação visual clara
 EIXO_COLORS = {
-    "Comportamento Alimentar": "#8B5CF6",  # Roxo
-    "Imagem Corporal": "#EC4899",  # Rosa
-    "Emoção e Autocontrole": "#F97316",  # Laranja
-    "Controle de Peso": "#10B981",  # Verde
-    "Percepção e Cognição": "#3B82F6",  # Azul
+    "Comportamento Alimentar": "#0D7377",  # Teal médio
+    "Imagem Corporal": "#14BDBE",  # Teal claro
+    "Emoção e Autocontrole": "#0891B2",  # Cyan médico
+    "Controle de Peso": "#0284C7",  # Azul médico
+    "Percepção e Cognição": "#0369A1",  # Azul profundo
 }
 
 # Tamanhos de fonte para projeção
@@ -80,3 +78,6 @@ FONT_SIZES = {
     "small": 12,  # Texto secundário
     "button": 15,  # Texto de botões
 }
+
+# Configurações de estilo
+BORDER_RADIUS = 2  # Raio de borda para elementos (Tkinter usa bd/relief)
