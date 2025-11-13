@@ -377,7 +377,9 @@ class ExpertSystemApp(tk.Tk):
 
     def answer(self, response):
         """Processa uma resposta"""
-        has_more = self.question_manager.answer_question(response)
+        # Converter boolean para string "sim"/"nao"
+        response_str = "sim" if response else "nao"
+        has_more = self.question_manager.answer_question(response_str)
 
         if has_more:
             self.display_question()
