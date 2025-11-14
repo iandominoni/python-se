@@ -70,14 +70,18 @@ EIXO_COLORS = {
 
 # Tamanhos de fonte para projeção
 FONT_SIZES = {
-    "title": 28,  # Títulos principais
-    "subtitle": 18,  # Subtítulos
-    "header": 22,  # Headers de seção
-    "body": 16,  # Texto principal
-    "label": 14,  # Labels e descrições
-    "small": 12,  # Texto secundário
-    "button": 15,  # Texto de botões
+    "title": 40,  # Títulos principais - Montserrat Bold
+    "subtitle": 20,  # Subtítulos - Poppins Regular
+    "header": 26,  # Headers de seção - Poppins Bold
+    "body": 16,  # Texto principal - Poppins Regular
+    "label": 14,  # Labels e descrições - Poppins Regular
+    "small": 12,  # Texto secundário - Poppins Regular
+    "button": 15,  # Texto de botões - Poppins Bold
 }
+
+# Fontes principais - Montserrat e Poppins
+FONT_FAMILY_TITLE = "Montserrat"  # Para títulos (Bold)
+FONT_FAMILY_BODY = "Poppins"  # Para texto geral (Regular/Bold)
 
 # Configurações de estilo
 BORDER_RADIUS = 2  # Raio de borda para elementos (Tkinter usa bd/relief)

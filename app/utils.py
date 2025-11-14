@@ -1,7 +1,3 @@
-"""
-Módulo de utilitários para cálculos e formatação.
-"""
-
 from config import SCORE_RANGES, MESSAGES
 
 
