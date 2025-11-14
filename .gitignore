@@ -25,3 +25,4 @@ Thumbs.db
 *.exe
 
 .vscode/
+history_cache.json

@@ -1,7 +1,3 @@
-"""
-Módulo para geração de PDFs de prontuários do paciente.
-"""
-
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch, cm
@@ -84,7 +80,6 @@ class PDFGenerator:
 
         Args:
             record: Dicionário com dados da avaliação
-            output_path: Caminho onde salvar o PDF (opcional)
 
         Returns:
             Caminho do arquivo PDF gerado
@@ -190,7 +185,9 @@ class PDFGenerator:
         story.append(Spacer(1, 0.3 * inch))
 
         # Respostas detalhadas
-        story.append(Paragraph("HISTÓRICO DE RESPOSTAS", self.styles["SectionTitle"]))
+        story.append(
+            Paragraph("HISTÓRICO DE RESPOSTAS DETALHADO", self.styles["SectionTitle"])
+        )
 
         responses = record.get("responses", [])
         if responses:
@@ -206,68 +203,51 @@ class PDFGenerator:
             for eixo, eixo_responses in responses_by_eixo.items():
                 story.append(Paragraph(f"<b>{eixo}</b>", self.styles["SectionTitle"]))
 
-                # Criar tabela de respostas
-                response_data = [
-                    [
-                        Paragraph("<b>Pergunta</b>", self.styles["CustomNormal"]),
-                        Paragraph("<b>Resposta</b>", self.styles["CustomNormal"]),
-                        Paragraph("<b>Pontos</b>", self.styles["CustomNormal"]),
-                    ]
-                ]
-
+                # Criar descrição detalhada para cada questão
                 for resp in eixo_responses:
                     question_id = resp.get("question_id", "N/A")
+                    pergunta_texto = resp.get(
+                        "pergunta_texto", "Pergunta não disponível"
+                    )
                     resposta = resp.get("resposta", "N/A")
-                    resposta_text = "SIM" if resposta == "sim" else "NÃO"
+                    resposta_text = "SIM" if resposta in ("sim", True) else "NÃO"
                     pontos = resp.get("pontos", 0)
-                    resposta_color = "#059669" if resposta == "sim" else "#DC2626"
-
-                    response_data.append(
-                        [
-                            Paragraph(
-                                f"Q{question_id:02d}", self.styles["CustomNormal"]
-                            ),
-                            Paragraph(
-                                f"<font color='{resposta_color}'><b>{resposta_text}</b></font>",
-                                self.styles["CustomNormal"],
-                            ),
-                            Paragraph(f"+{pontos}", self.styles["CustomNormal"]),
-                        ]
+                    resposta_color = (
+                        "#059669" if resposta in ("sim", True) else "#DC2626"
                     )
 
-                response_table = Table(
-                    response_data, colWidths=[1.5 * inch, 2.5 * inch, 1.5 * inch]
-                )
-                response_table.setStyle(
-                    TableStyle(
-                        [
-                            ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0D7377")),
-                            ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
-                            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                            ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                            ("FONTSIZE", (0, 0), (-1, 0), 10),
-                            ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
-                            ("TOPPADDING", (0, 0), (-1, 0), 10),
-                            (
-                                "BACKGROUND",
-                                (0, 1),
-                                (-1, -1),
-                                colors.HexColor("#F8F9FA"),
-                            ),
-                            ("TEXTCOLOR", (0, 1), (-1, -1), colors.black),
-                            ("FONTSIZE", (0, 1), (-1, -1), 10),
-                            ("ALIGN", (2, 1), (2, -1), "RIGHT"),
-                            ("GRID", (0, 0), (-1, -1), 1, colors.HexColor("#E5E7EB")),
-                            (
-                                "ROWBACKGROUNDS",
-                                (0, 1),
-                                (-1, -1),
-                                [colors.white, colors.HexColor("#FAFBFC")],
-                            ),
-                        ]
+                    # Criar estilo para questão
+                    question_style = ParagraphStyle(
+                        name=f"Question{question_id}",
+                        parent=self.styles["Normal"],
+                        fontSize=10,
+                        spaceAfter=8,
+                        leftIndent=20,
+                        textColor=colors.black,
                     )
-                )
-                story.append(response_table)
+
+                    # Pergunta
+                    question_text = Paragraph(
+                        f"<b>Q{question_id:02d}:</b> {pergunta_texto}",
+                        question_style,
+                    )
+                    story.append(question_text)
+
+                    # Resposta com cor
+                    answer_style = ParagraphStyle(
+                        name=f"Answer{question_id}",
+                        parent=self.styles["Normal"],
+                        fontSize=10,
+                        spaceAfter=12,
+                        leftIndent=40,
+                        textColor=colors.HexColor(resposta_color),
+                    )
+                    answer_text_para = Paragraph(
+                        f"<b>Resposta:</b> <b>{resposta_text}</b> (+{pontos} pts)",
+                        answer_style,
+                    )
+                    story.append(answer_text_para)
+
                 story.append(Spacer(1, 0.2 * inch))
         else:
             story.append(

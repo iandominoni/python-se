@@ -27,6 +27,119 @@ from utils import get_risk_level
 from pdf_generator import PDFGenerator
 
 
+class ResponsesListWidget(QFrame):
+    """Widget otimizado para exibir respostas agrupadas por eixo."""
+
+    def __init__(self, responses, parent=None):
+        super().__init__(parent)
+        self.responses = responses
+        self.setup_ui()
+
+    def setup_ui(self):
+        """Cria a UI com respostas organizadas por eixo."""
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(14)
+
+        if self.responses:
+            # Agrupar respostas por eixo
+            responses_by_eixo = {}
+            for resp in self.responses:
+                eixo_nome = resp.get("eixo_nome", "Desconhecido")
+                if eixo_nome not in responses_by_eixo:
+                    responses_by_eixo[eixo_nome] = []
+                responses_by_eixo[eixo_nome].append(resp)
+
+            # Criar card para cada eixo
+            for eixo_nome, eixo_responses in responses_by_eixo.items():
+                eixo_card = self._create_eixo_card(eixo_nome, eixo_responses)
+                layout.addWidget(eixo_card)
+        else:
+            empty_label = QLabel("Sem respostas registradas.")
+            empty_label.setStyleSheet(
+                f"color: {SECONDARY_TEXT}; font-size: 13px; font-family: 'Poppins';"
+            )
+            layout.addWidget(empty_label)
+
+        self.setLayout(layout)
+
+    def _create_eixo_card(self, eixo_nome, eixo_responses):
+        """Cria um card agrupado por eixo."""
+        card = QFrame()
+        card.setStyleSheet(
+            f"""
+            QFrame {{
+                background-color: white;
+                border-radius: 10px;
+                border: 2px solid {self._get_eixo_color(eixo_nome)};
+                padding: 14px;
+            }}
+        """
+        )
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(10, 8, 10, 8)
+        layout.setSpacing(8)
+
+        # Título do eixo com cor
+        eixo_color = self._get_eixo_color(eixo_nome)
+        eixo_title = QLabel(eixo_nome)
+        eixo_title.setStyleSheet(
+            f"""
+            color: {eixo_color};
+            font-size: 13px;
+            font-weight: 700;
+            font-family: 'Poppins';
+            """
+        )
+        layout.addWidget(eixo_title)
+
+        # Respostas agrupadas por questão com pergunta visível
+        for resp in eixo_responses:
+            answer_icon = "✓" if resp["resposta"] in ("sim", True) else "✗"
+            answer_color = "#059669" if resp["resposta"] in ("sim", True) else "#DC2626"
+            answer_text = "SIM" if resp["resposta"] in ("sim", True) else "NÃO"
+
+            question_html = f"""
+            <div style="margin-bottom: 8px;">
+                <span style="color: {answer_color}; font-weight: 700; font-size: 11px;">Q{resp['question_id']:02d} {answer_icon} {answer_text}</span>
+                <br/>
+                <span style="color: #4B5563; font-size: 11px; font-weight: 400;">{resp.get('pergunta_texto', '')}</span>
+            </div>
+            """
+
+            question_label = QLabel(question_html)
+            question_label.setTextFormat(Qt.TextFormat.RichText)
+            question_label.setStyleSheet("font-family: 'Poppins';")
+            question_label.setWordWrap(True)
+            layout.addWidget(question_label)
+
+        card.setLayout(layout)
+
+        # Sombra sutil
+        shadow = QGraphicsDropShadowEffect(card)
+        shadow.setBlurRadius(6)
+        shadow.setOffset(0, 2)
+        shadow.setColor(QColor(0, 0, 0, 15))
+        card.setGraphicsEffect(shadow)
+
+        return card
+
+    @staticmethod
+    def _get_eixo_color(eixo_nome):
+        """Retorna a cor do eixo."""
+        eixo_colors = {
+            "Comportamento Alimentar": "#0D7377",
+            "Imagem Corporal": "#14BDBE",
+            "Emoção e Autoconceito": "#0891B2",
+            "Controle e Rotina": "#0284C7",
+            "Percepção do Problema": "#0369A1",
+        }
+        # Limpar prefixo "Eixo X — " se existir
+        clean_name = eixo_nome.split("—")[-1].strip() if "—" in eixo_nome else eixo_nome
+        return eixo_colors.get(clean_name, "#0D7377")
+
+
 class ModernButton(QPushButton):
     """Botão moderno com bordas arredondadas e hover effect."""
 
@@ -51,7 +164,7 @@ class ModernButton(QPushButton):
                 padding: 18px 34px;
                 font-size: 17px;
                 font-weight: 600;
-                font-family: 'Segoe UI', -apple-system, sans-serif;
+                font-family: 'Poppins', sans-serif;
             }}
             QPushButton:hover {{
                 background-color: {self.hover_color};
@@ -110,7 +223,7 @@ class StatCard(QFrame):
             color: white;
             font-size: 38px;
             font-weight: 700;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
             
         """
         )
@@ -124,7 +237,7 @@ class StatCard(QFrame):
             color: rgba(255, 255, 255, 0.95);
             font-size: 15px;
             font-weight: 600;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
         """
         )
         text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -198,7 +311,7 @@ class HistoryCard(QFrame):
             color: {text_color};
             font-size: 15px;
             font-weight: 600;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
         """
         )
         info_layout.addWidget(name_label)
@@ -211,7 +324,7 @@ class HistoryCard(QFrame):
             color: #6B7280;
             font-size: 12px;
             font-weight: 400;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
         """
         )
         info_label.setWordWrap(True)
@@ -341,7 +454,7 @@ class ExpertSystemApp(QMainWindow):
             color: {text_color};
             font-size: {font_size}px;
             font-weight: 700;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Montserrat', sans-serif;
         """
         )
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -405,7 +518,7 @@ class ExpertSystemApp(QMainWindow):
                 color: {subtitle_color};
                 font-size: 18px;
                 font-weight: 500;
-                font-family: 'Segoe UI', -apple-system, sans-serif;
+                font-family: 'Poppins', sans-serif;
                 margin-top: 6px;
             """
             )
@@ -450,7 +563,7 @@ class ExpertSystemApp(QMainWindow):
                 color: {color};
                 font-size: {title_size}px;
                 font-weight: 700;
-                font-family: 'Segoe UI', -apple-system, sans-serif;
+                font-family: 'Montserrat', sans-serif;
             """
             )
         for lbl in self.findChildren(QLabel, "app_header_subtitle"):
@@ -461,7 +574,7 @@ class ExpertSystemApp(QMainWindow):
                 color: {color};
                 font-size: {subtitle_size}px;
                 font-weight: 500;
-                font-family: 'Segoe UI', -apple-system, sans-serif;
+                font-family: 'Poppins', sans-serif;
                 margin-top: 6px;
             """
             )
@@ -540,7 +653,7 @@ class ExpertSystemApp(QMainWindow):
             font-size: 14px;
             font-weight: 400;
             line-height: 1.6;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
         """
         )
         desc_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -572,8 +685,8 @@ class ExpertSystemApp(QMainWindow):
 
         self.stack.addWidget(widget)
 
-    def show_history(self):
-        """Exibe o histórico de avaliações."""
+    def show_history(self, page=0):
+        """Exibe o histórico de avaliações com paginação."""
         self.clear_stack()
 
         widget = QWidget()
@@ -596,20 +709,36 @@ class ExpertSystemApp(QMainWindow):
         content_layout.setSpacing(10)
         content_widget.setStyleSheet(f"background-color: {PRIMARY_COLOR};")
 
-        if self.history_manager.get_count() == 0:
+        # Configuração de paginação
+        records_per_page = 8
+        all_records = self.history_manager.get_all()
+        total_records = len(all_records)
+        total_pages = (total_records + records_per_page - 1) // records_per_page
+
+        if total_records == 0:
             empty_label = QLabel("Nenhuma avaliação realizada ainda.")
             empty_label.setStyleSheet(
                 f"""
                 color: {DARK_TEXT};
                 font-size: 14px;
-                font-family: 'Segoe UI';
+                font-family: 'Poppins';
             """
             )
             empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             content_layout.addWidget(empty_label)
         else:
-            for idx, record in enumerate(self.history_manager.get_all()):
-                card = HistoryCard(idx + 1, record, self.show_history_details)
+            # Validar página
+            page = max(0, min(page, total_pages - 1))
+
+            # Calcular índices
+            start_idx = page * records_per_page
+            end_idx = start_idx + records_per_page
+
+            # Pegar registros para a página atual
+            records_to_display = all_records[start_idx:end_idx]
+
+            for idx, record in enumerate(records_to_display, start=start_idx + 1):
+                card = HistoryCard(idx, record, self.show_history_details)
                 content_layout.addWidget(card)
 
         content_layout.addStretch()
@@ -618,15 +747,54 @@ class ExpertSystemApp(QMainWindow):
 
         main_layout.addWidget(scroll)
 
-        # Botão voltar (não ocupar tela toda)
+        # Barra de controles com paginação
         controls = QHBoxLayout()
+        controls.setContentsMargins(20, 20, 20, 20)
+        controls.setSpacing(12)
+
+        # Botão voltar
         back_btn = ModernButton("← Voltar", SECONDARY_COLOR)
         back_btn.setMaximumWidth(200)
         back_btn.setMinimumHeight(44)
         back_btn.clicked.connect(self.show_menu)
         controls.addWidget(back_btn, 0, Qt.AlignmentFlag.AlignLeft)
+
         controls.addStretch(1)
-        controls.setContentsMargins(20, 20, 20, 20)
+
+        # Paginação
+        if total_records > 0:
+            # Botão página anterior
+            if page > 0:
+                prev_btn = ModernButton("← Anterior", ACCENT_COLOR)
+                prev_btn.setMaximumWidth(160)
+                prev_btn.setMinimumHeight(40)
+                prev_btn.clicked.connect(lambda: self.show_history(page - 1))
+                controls.addWidget(prev_btn)
+
+            # Texto de página
+            page_info = QLabel(f"Página {page + 1} de {total_pages}")
+            page_info.setStyleSheet(
+                f"""
+                color: {DARK_TEXT};
+                font-size: 13px;
+                font-weight: 600;
+                font-family: 'Poppins';
+                padding: 0px 16px;
+            """
+            )
+            page_info.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            page_info.setMinimumWidth(150)
+            controls.addWidget(page_info)
+
+            # Botão próxima página
+            if page < total_pages - 1:
+                next_btn = ModernButton("Próxima →", ACCENT_COLOR)
+                next_btn.setMaximumWidth(160)
+                next_btn.setMinimumHeight(40)
+                next_btn.clicked.connect(lambda: self.show_history(page + 1))
+                controls.addWidget(next_btn)
+
+        controls.addStretch(1)
         main_layout.addLayout(controls)
 
         widget.setLayout(main_layout)
@@ -697,7 +865,7 @@ class ExpertSystemApp(QMainWindow):
             color: {DARK_TEXT};
             font-size: 13px;
             font-weight: 600;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin-top: 8px;
         """
         )
@@ -710,53 +878,73 @@ class ExpertSystemApp(QMainWindow):
         # Conteúdo
         content = QWidget()
         content_layout = QVBoxLayout()
-        content_layout.setContentsMargins(40, 30, 40, 30)
+        content_layout.setContentsMargins(20, 20, 20, 20)
         content_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # Box centralizada para pergunta e respostas
+        # Calcular altura responsiva baseada no tamanho disponível
+        available_height = (
+            self.height() - 300
+        )  # Subtrair header, progress, botão cancelar
+        available_height = max(available_height, 300)  # Mínimo de 300px
+
+        # Box centralizada para pergunta e respostas (com altura responsiva)
         box = QFrame()
         box.setStyleSheet(
             f"""
             QFrame {{
                 background-color: {LIGHT_BG};
                 border-radius: 16px;
-                padding: 40px 50px;
-                max-width: 600px;
+                padding: 30px 40px;
             }}
         """
         )
         box.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-        box_layout = QVBoxLayout()
-        box_layout.setSpacing(24)
-        box_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        box.setMinimumHeight(int(available_height * 0.4))
+        box.setMaximumHeight(int(available_height * 0.6))
 
-        # Card da pergunta
+        box_layout = QVBoxLayout()
+        box_layout.setSpacing(20)
+        box_layout.setContentsMargins(0, 0, 0, 0)
+        box_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+
+        # Card da pergunta com espaço expansível
         question_label = QLabel(question["texto"])
         question_label.setStyleSheet(
             f"""
             color: {DARK_TEXT};
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             line-height: 1.5;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
-        """
+            font-family: 'Poppins', sans-serif;
+            padding: 15px;
+            background-color: white;
+            """
         )
         question_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         question_label.setWordWrap(True)
+        question_label.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
+        )
         box_layout.addWidget(question_label)
 
-        # Botões de resposta (verde SIM, vermelho NÃO)
+        # Botões de resposta (verde SIM, vermelho NÃO) - sempre no final
         btn_layout = QHBoxLayout()
-        btn_layout.setSpacing(16)
+        btn_layout.setSpacing(12)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
+        # Tamanho responsivo dos botões baseado na altura disponível
+        btn_width = max(100, int(available_height * 0.15))
+        btn_height = max(40, int(available_height * 0.12))
+
         yes_btn = ModernButton("Sim", "#059669")  # Verde
-        yes_btn.setMinimumWidth(140)
+        yes_btn.setMinimumWidth(btn_width)
+        yes_btn.setMinimumHeight(btn_height)
         yes_btn.clicked.connect(lambda: self.answer(True))
         btn_layout.addWidget(yes_btn)
 
         no_btn = ModernButton("Não", "#DC2626")  # Vermelho
-        no_btn.setMinimumWidth(140)
+        no_btn.setMinimumWidth(btn_width)
+        no_btn.setMinimumHeight(btn_height)
         no_btn.clicked.connect(lambda: self.answer(False))
         btn_layout.addWidget(no_btn)
 
@@ -834,7 +1022,7 @@ class ExpertSystemApp(QMainWindow):
             color: {DARK_TEXT};
             font-size: 18px;
             font-weight: bold;
-            font-family: 'Segoe UI';
+            font-family: 'Poppins';
         """
         )
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -852,7 +1040,7 @@ class ExpertSystemApp(QMainWindow):
                 padding: 16px;
                 font-size: 15px;
                 font-weight: 500;
-                font-family: 'Segoe UI', -apple-system, sans-serif;
+                font-family: 'Poppins', -apple-system, sans-serif;
             }}
             QLineEdit:focus {{
                 border: 2px solid {SECONDARY_COLOR};
@@ -941,9 +1129,9 @@ class ExpertSystemApp(QMainWindow):
         patient_label.setStyleSheet(
             f"""
             color: {DARK_TEXT};
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            font-family: 'Segoe UI';
+            font-family: 'Montserrat';
         """
         )
         patient_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -970,9 +1158,9 @@ class ExpertSystemApp(QMainWindow):
         level_label.setStyleSheet(
             """
             color: white;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: bold;
-            font-family: 'Segoe UI';
+            font-family: 'Montserrat';
         """
         )
         level_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -984,7 +1172,7 @@ class ExpertSystemApp(QMainWindow):
             color: white;
             font-size: 20px;
             font-weight: bold;
-            font-family: 'Segoe UI';
+            font-family: 'Poppins';
         """
         )
         score_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1013,7 +1201,7 @@ class ExpertSystemApp(QMainWindow):
             color: {WARNING_COLOR};
             font-size: 18px;
             font-weight: bold;
-            font-family: 'Segoe UI';
+            font-family: 'Montserrat';
         """
         )
         note_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1028,7 +1216,7 @@ class ExpertSystemApp(QMainWindow):
             f"""
             color: {DARK_TEXT};
             font-size: 13px;
-            font-family: 'Segoe UI';
+            font-family: 'Poppins';
         """
         )
         note_text.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1100,7 +1288,7 @@ class ExpertSystemApp(QMainWindow):
             )
 
     def show_history_details(self, index):
-        """Exibe detalhes da avaliação selecionada."""
+        """Exibe detalhes da avaliação selecionada com renderização otimizada."""
         record = self.history_manager.get_assessment(index)
         if not record:
             self.show_history()
@@ -1138,7 +1326,7 @@ class ExpertSystemApp(QMainWindow):
             color: white;
             font-size: 16px;
             font-weight: 700;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', -apple-system, sans-serif;
         """
         )
         header_title.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1150,7 +1338,7 @@ class ExpertSystemApp(QMainWindow):
             color: rgba(255, 255, 255, 0.8);
             font-size: 12px;
             font-weight: 500;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', -apple-system, sans-serif;
         """
         )
         header_subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1169,18 +1357,18 @@ class ExpertSystemApp(QMainWindow):
         content_layout.setContentsMargins(24, 20, 24, 20)
         content_layout.setSpacing(16)
 
-        # Cores suaves por nível de risco (azul claro → vermelho fraco)
+        # Cores suaves por nível de risco
         soft_level_colors = {
-            "Baixo": "#E0F2FE",  # Azul claro
-            "Médio": "#FEF3C7",  # Amarelo claro
-            "Alto": "#FED7D7",  # Vermelho fraco
-            "Crítico": "#FED7D7",  # Vermelho fraco
+            "Baixo": "#E0F2FE",
+            "Médio": "#FEF3C7",
+            "Alto": "#FED7D7",
+            "Crítico": "#FED7D7",
         }
         soft_bg_color = soft_level_colors.get(level, "#E0F2FE")
-        text_color = "#1F2937"  # Texto escuro
+        text_color = "#1F2937"
         level_color_strong = LEVEL_COLORS.get(level, SECONDARY_COLOR)
 
-        # Card paciente (com cores suaves)
+        # Card paciente
         patient_card = QFrame()
         patient_card.setStyleSheet(
             f"""
@@ -1199,9 +1387,9 @@ class ExpertSystemApp(QMainWindow):
         patient_name_label.setStyleSheet(
             f"""
             color: {text_color};
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Montserrat', -apple-system, sans-serif;
         """
         )
         patient_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -1213,14 +1401,13 @@ class ExpertSystemApp(QMainWindow):
             color: #6B7280;
             font-size: 13px;
             font-weight: 400;
-            font-family: 'Segoe UI', -apple-system, sans-serif;
+            font-family: 'Poppins', -apple-system, sans-serif;
         """
         )
         date_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         patient_layout.addWidget(date_label)
         patient_card.setLayout(patient_layout)
 
-        # Sombra sutil
         shadow_patient = QGraphicsDropShadowEffect(patient_card)
         shadow_patient.setBlurRadius(8)
         shadow_patient.setOffset(0, 1)
@@ -1229,39 +1416,27 @@ class ExpertSystemApp(QMainWindow):
 
         content_layout.addWidget(patient_card)
 
-        # Card do resultado (cores suaves)
+        # Card do resultado
         result_card = QFrame()
-        result_card.setStyleSheet(
-            f"""
-            QFrame {{
-                background-color: {soft_bg_color};
-                padding: 20px;
-            }}
-            """
-        )
+        result_card.setStyleSheet(f"background-color: {soft_bg_color}; padding: 20px;")
         result_layout = QVBoxLayout()
         result_layout.setSpacing(6)
 
         title = QLabel(f"{icon}  Nível de Risco: {level}")
         title.setStyleSheet(
-            f"""
-            color: {level_color_strong}; font-size: 20px; font-weight: 700; font-family: 'Segoe UI';
-            """
+            f"color: {level_color_strong}; font-size: 20px; font-weight: 700; font-family: 'Montserrat';"
         )
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         score_label = QLabel(f"Pontuação: {record.get('score', 0)} pontos")
         score_label.setStyleSheet(
-            f"""
-            color: {text_color}; font-size: 15px; font-weight: 600; font-family: 'Segoe UI';
-            """
+            f"color: {text_color}; font-size: 15px; font-weight: 600; font-family: 'Poppins';"
         )
         score_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         result_layout.addWidget(title)
         result_layout.addWidget(score_label)
         result_card.setLayout(result_layout)
 
-        # Sombra result_card sutil
         shadow = QGraphicsDropShadowEffect(result_card)
         shadow.setBlurRadius(10)
         shadow.setOffset(0, 1)
@@ -1270,7 +1445,7 @@ class ExpertSystemApp(QMainWindow):
 
         content_layout.addWidget(result_card)
 
-        # Card de respostas com melhor organização
+        # Card de respostas com novo componente otimizado
         responses_card = QFrame()
         responses_card.setStyleSheet(
             f"""
@@ -1284,63 +1459,19 @@ class ExpertSystemApp(QMainWindow):
         )
         rl = QVBoxLayout()
         rl.setSpacing(10)
+        rl.setContentsMargins(0, 0, 0, 0)
 
-        # Título
         resp_title = QLabel("Respostas do Paciente")
         resp_title.setStyleSheet(
-            f"color: {DARK_TEXT}; font-size: 15px; font-weight: 700; font-family: 'Segoe UI';"
+            f"color: {DARK_TEXT}; font-size: 15px; font-weight: 700; font-family: 'Poppins';"
         )
         rl.addWidget(resp_title)
-        rl.addSpacing(8)
+        rl.addSpacing(4)
 
+        # Usar o novo componente de respostas
         if record.get("responses"):
-            for resp in record["responses"]:
-                # Frame individual para cada resposta com sombra
-                resp_frame = QFrame()
-                resp_frame.setStyleSheet(
-                    f"""
-                    QFrame {{
-                        background-color: white;
-                        border-radius: 8px;
-                        padding: 10px 12px;
-                        border: 1px solid {BORDER_COLOR};
-                    }}
-                """
-                )
-                resp_frame_layout = QVBoxLayout()
-                resp_frame_layout.setContentsMargins(0, 0, 0, 0)
-                resp_frame_layout.setSpacing(4)
-
-                # Linha com resposta
-                answer_icon = "✓" if resp["resposta"] == "sim" else "✗"
-                answer_text = "SIM" if resp["resposta"] == "sim" else "NÃO"
-                answer_color = "#059669" if resp["resposta"] == "sim" else "#DC2626"
-
-                line = QLabel(f"Q{resp['question_id']:02d} • {resp['eixo_nome']}")
-                line.setStyleSheet(
-                    f"color: {DARK_TEXT}; font-size: 13px; font-weight: 600; font-family: 'Segoe UI';"
-                )
-                line.setWordWrap(True)
-                resp_frame_layout.addWidget(line)
-
-                # Resposta com cor
-                resp_line = QLabel(
-                    f"  {answer_icon} {answer_text}  (+{resp['pontos']} pts)"
-                )
-                resp_line.setStyleSheet(
-                    f"color: {answer_color}; font-size: 13px; font-weight: 700; font-family: 'Segoe UI';"
-                )
-                resp_frame_layout.addWidget(resp_line)
-                resp_frame.setLayout(resp_frame_layout)
-
-                # Sombra individual para cada resposta
-                shadow_resp = QGraphicsDropShadowEffect(resp_frame)
-                shadow_resp.setBlurRadius(8)
-                shadow_resp.setOffset(0, 2)
-                shadow_resp.setColor(QColor(0, 0, 0, 15))
-                resp_frame.setGraphicsEffect(shadow_resp)
-
-                rl.addWidget(resp_frame)
+            responses_list = ResponsesListWidget(record["responses"])
+            rl.addWidget(responses_list)
         else:
             empty = QLabel("Sem respostas registradas.")
             empty.setStyleSheet(f"color: {SECONDARY_TEXT}; font-size: 13px;")
@@ -1348,7 +1479,6 @@ class ExpertSystemApp(QMainWindow):
 
         responses_card.setLayout(rl)
 
-        # Sombra externa sutil do card
         shadow2 = QGraphicsDropShadowEffect(responses_card)
         shadow2.setBlurRadius(12)
         shadow2.setOffset(0, 2)
@@ -1362,7 +1492,7 @@ class ExpertSystemApp(QMainWindow):
         scroll.setWidget(content_widget)
         main_layout.addWidget(scroll)
 
-        # Barra de ações (botões centralizados)
+        # Barra de ações
         actions = QHBoxLayout()
         actions.addStretch(1)
 
@@ -1392,7 +1522,7 @@ def main():
     app = QApplication(sys.argv)
 
     # Configurar fonte padrão (maior para legibilidade)
-    font = QFont("Segoe UI", 13)
+    font = QFont("Poppins", 13)
     app.setFont(font)
 
     # Criar e mostrar janela

@@ -128,11 +128,13 @@ class HistoryManager:
         return os.path.join(base_path, "history_cache.json")
 
     def _load_from_cache(self):
-        """Carrega o histórico do arquivo de cache."""
+        """Carrega o histórico do arquivo de cache com limite de registros."""
         try:
             if os.path.exists(self.cache_file):
                 with open(self.cache_file, "r", encoding="utf-8") as f:
-                    self.history = json.load(f)
+                    data = json.load(f)
+                    # Manter apenas os últimos 100 registros para performance
+                    self.history = data[-100:] if len(data) > 100 else data
         except (FileNotFoundError, json.JSONDecodeError):
             self.history = []
 
