@@ -15,6 +15,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy,
     QFileDialog,
     QMessageBox,
+    QDialog,
 )
 from PyQt6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QSize
 from PyQt6.QtGui import QFont, QPalette, QColor
@@ -25,6 +26,8 @@ from config import *
 from data_manager import QuestionManager, HistoryManager, load_questions
 from utils import get_risk_level
 from pdf_generator import PDFGenerator
+from accordion import AccordionWidget
+from db import Database
 
 
 class ResponsesListWidget(QFrame):
@@ -254,12 +257,11 @@ class StatCard(QFrame):
 
 
 class HistoryCard(QFrame):
-    """Card de histórico com design moderno."""
-
-    def __init__(self, number, data, on_view_details, parent=None):
+    def __init__(self, number, data, on_view_details, on_delete, parent=None):
         super().__init__(parent)
         self.data = data
         self.on_view_details = on_view_details
+        self.on_delete = on_delete
         self.number = number
 
         level = data.get("level", "Baixo")
@@ -304,7 +306,7 @@ class HistoryCard(QFrame):
         info_layout.setSpacing(2)
 
         # Nome do paciente
-        patient_name = data.get("patient_name", "Paciente sem nome")
+        patient_name = data.get("patient_name")
         name_label = QLabel(patient_name)
         name_label.setStyleSheet(
             f"""
@@ -358,9 +360,36 @@ class HistoryCard(QFrame):
         """
         )
         details_btn.clicked.connect(lambda: self.on_view_details(number - 1))
-        layout.addWidget(
-            details_btn, 0, Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
-        )
+        layout.addWidget(details_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        # Botão excluir (somente se possuir id)
+        if "id" in data:
+            delete_btn = ModernButton("✕", DANGER_COLOR)
+            delete_btn.setMaximumWidth(50)
+            delete_btn.setMinimumHeight(36)
+            delete_btn.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: {DANGER_COLOR};
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 6px 10px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    font-family: 'Segoe UI', -apple-system, sans-serif;
+                }}
+                QPushButton:hover {{
+                    background-color: {ModernButton.lighten_color(DANGER_COLOR, 15)};
+                }}
+                QPushButton:pressed {{
+                    padding-top: 7px;
+                    padding-bottom: 5px;
+                }}
+                """
+            )
+            delete_btn.clicked.connect(lambda: self.on_delete(self.data.get("id")))
+            layout.addWidget(delete_btn, 0, Qt.AlignmentFlag.AlignVCenter)
 
         self.setLayout(layout)
 
@@ -379,6 +408,9 @@ class ExpertSystemApp(QMainWindow):
         super().__init__()
         self.setWindowTitle("Sistema de Avaliação de Risco - DSM-5")
         self.setMinimumSize(950, 700)
+
+        # Inicializar banco de dados
+        self.db = Database()
 
         # Carregar dados
         questions_data = load_questions()
@@ -738,7 +770,12 @@ class ExpertSystemApp(QMainWindow):
             records_to_display = all_records[start_idx:end_idx]
 
             for idx, record in enumerate(records_to_display, start=start_idx + 1):
-                card = HistoryCard(idx, record, self.show_history_details)
+                card = HistoryCard(
+                    idx,
+                    record,
+                    self.show_history_details,
+                    self.delete_evaluation,
+                )
                 content_layout.addWidget(card)
 
         content_layout.addStretch()
@@ -758,6 +795,15 @@ class ExpertSystemApp(QMainWindow):
         back_btn.setMinimumHeight(44)
         back_btn.clicked.connect(self.show_menu)
         controls.addWidget(back_btn, 0, Qt.AlignmentFlag.AlignLeft)
+
+        # Botão limpar órfãs (se existirem)
+        orphan_count = len(self.db.get_orphan_avaliacoes())
+        if orphan_count > 0:
+            clean_btn = ModernButton(f"Limpar Órfãs ({orphan_count})", WARNING_COLOR)
+            clean_btn.setMaximumWidth(220)
+            clean_btn.setMinimumHeight(44)
+            clean_btn.clicked.connect(self.delete_orphans)
+            controls.addWidget(clean_btn, 0, Qt.AlignmentFlag.AlignLeft)
 
         controls.addStretch(1)
 
@@ -799,6 +845,39 @@ class ExpertSystemApp(QMainWindow):
 
         widget.setLayout(main_layout)
         self.stack.addWidget(widget)
+
+    def delete_evaluation(self, avaliacao_id):
+        """Exclui uma avaliação específica após confirmação."""
+        if avaliacao_id is None:
+            return
+        reply = QMessageBox.question(
+            self,
+            "Confirmar Exclusão",
+            "Deseja realmente excluir esta avaliação? Esta ação não pode ser desfeita.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            self.db.delete_avaliacao(avaliacao_id)
+            self.show_history()  # atualizar lista
+
+    def delete_orphans(self):
+        """Exclui todas as avaliações órfãs (sem respostas)."""
+        orphans = self.db.get_orphan_avaliacoes()
+        if not orphans:
+            QMessageBox.information(
+                self, "Limpeza", "Nenhuma avaliação órfã encontrada."
+            )
+            return
+        reply = QMessageBox.question(
+            self,
+            "Confirmar Limpeza",
+            f"Remover {len(orphans)} avaliação(ões) sem respostas?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            for av in orphans:
+                self.db.delete_avaliacao(av["id"])
+            self.show_history()
 
     def start_quiz(self):
         """Inicia o questionário."""
@@ -927,7 +1006,7 @@ class ExpertSystemApp(QMainWindow):
         )
         box_layout.addWidget(question_label)
 
-        # Botões de resposta (verde SIM, vermelho NÃO) - sempre no final
+        # Botões de resposta (ambos com mesma cor para não induzir resposta)
         btn_layout = QHBoxLayout()
         btn_layout.setSpacing(12)
         btn_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -936,13 +1015,13 @@ class ExpertSystemApp(QMainWindow):
         btn_width = max(100, int(available_height * 0.15))
         btn_height = max(40, int(available_height * 0.12))
 
-        yes_btn = ModernButton("Sim", "#059669")  # Verde
+        yes_btn = ModernButton("Sim", SECONDARY_COLOR)
         yes_btn.setMinimumWidth(btn_width)
         yes_btn.setMinimumHeight(btn_height)
         yes_btn.clicked.connect(lambda: self.answer(True))
         btn_layout.addWidget(yes_btn)
 
-        no_btn = ModernButton("Não", "#DC2626")  # Vermelho
+        no_btn = ModernButton("Não", SECONDARY_COLOR)
         no_btn.setMinimumWidth(btn_width)
         no_btn.setMinimumHeight(btn_height)
         no_btn.clicked.connect(lambda: self.answer(False))
@@ -1085,12 +1164,20 @@ class ExpertSystemApp(QMainWindow):
         self.show_results(name)
 
     def show_results(self, patient_name):
-        """Exibe resultados."""
+        """Exibe resultados com acordeons de respostas por eixo."""
         self.clear_stack()
 
         risk_level = get_risk_level(self.question_manager.score)
         color = LEVEL_COLORS.get(risk_level, SUCCESS_COLOR)
         icon = LEVEL_ICONS.get(risk_level, "●")
+
+        # Salvar avaliação e respostas ATOMICAMENTE antes de montar UI
+        avaliacao_id = self.db.save_avaliacao_with_respostas(
+            patient_name,
+            risk_level,
+            self.question_manager.score,
+            self.question_manager.responses,
+        )
 
         widget = QWidget()
         main_layout = QVBoxLayout()
@@ -1181,6 +1268,32 @@ class ExpertSystemApp(QMainWindow):
         result_card.setLayout(result_layout)
         content_layout.addWidget(result_card)
 
+        # Seção de Acordeons - Respostas por Eixo
+        accordeon_title = QLabel("Respostas Detalhadas por Eixo")
+        accordeon_title.setStyleSheet(
+            f"""
+            color: {DARK_TEXT};
+            font-size: 20px;
+            font-weight: 700;
+            font-family: 'Poppins';
+            margin-top: 20px;
+        """
+        )
+        content_layout.addWidget(accordeon_title)
+
+        # Criar widget de acordeons (filtrado por esta avaliação recém salva)
+        eixos_nomes = [
+            "Eixo 1 — Comportamento Alimentar",
+            "Eixo 2 — Imagem Corporal",
+            "Eixo 3 — Emoção e Autoconceito",
+            "Eixo 4 — Controle e Rotina",
+            "Eixo 5 — Percepção do Problema",
+        ]
+        accordion_widget = AccordionWidget(
+            self.db, eixos_nomes, avaliacao_id=avaliacao_id
+        )
+        content_layout.addWidget(accordion_widget)
+
         # Card aviso
         note_card = QFrame()
         note_card.setStyleSheet(
@@ -1249,15 +1362,7 @@ class ExpertSystemApp(QMainWindow):
         widget.setLayout(main_layout)
         self.stack.addWidget(widget)
 
-        # Salvar no histórico
-        assessment_data = {
-            "patient_name": patient_name,
-            "data": datetime.now().strftime("%d/%m/%Y %H:%M"),
-            "level": risk_level,
-            "score": self.question_manager.score,
-            "responses": self.question_manager.responses,
-        }
-        self.history_manager.add_assessment(assessment_data)
+        # Já salvo acima com transação; nada adicional aqui
 
     def export_to_pdf(self, record):
         """Exporta o prontuário do paciente para PDF."""
@@ -1285,6 +1390,162 @@ class ExpertSystemApp(QMainWindow):
                 self,
                 "Erro",
                 f"Erro ao gerar PDF:\n{str(e)}",
+            )
+
+    def send_via_email(self, record):
+        """Abre diálogo para enviar prontuário por email."""
+        try:
+            from email_sender import EmailSender
+            import tempfile
+            from pdf_generator import PDFGenerator
+
+            # Dialog para entrar email
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Enviar Prontuário por Email")
+            dialog.setModal(True)
+
+            layout = QVBoxLayout()
+            layout.setSpacing(16)
+            layout.setContentsMargins(24, 24, 24, 24)
+
+            # Label
+            label = QLabel("Email do destinatário:")
+            label.setStyleSheet(
+                f"color: {PRIMARY_COLOR}; font-size: 14px; font-weight: 600; font-family: 'Poppins';"
+            )
+            layout.addWidget(label)
+
+            # Input email
+            email_input = QLineEdit()
+            email_input.setPlaceholderText("exemplo@email.com")
+            email_input.setStyleSheet(
+                f"""
+                QLineEdit {{
+                    border: 1px solid {BORDER_COLOR};
+                    border-radius: 6px;
+                    padding: 10px;
+                    color: {DARK_TEXT};
+                    font-size: 13px;
+                    background-color: white;
+                }}
+                QLineEdit:focus {{
+                    border: 2px solid {SECONDARY_COLOR};
+                }}
+            """
+            )
+            email_input.setMinimumHeight(44)
+            layout.addWidget(email_input)
+
+            layout.addSpacing(8)
+
+            # Botões
+            btn_layout = QHBoxLayout()
+            btn_layout.setSpacing(12)
+
+            cancel_btn = QPushButton("Cancelar")
+            cancel_btn.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: {BORDER_COLOR};
+                    color: {DARK_TEXT};
+                    border: none;
+                    border-radius: 6px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                    font-family: 'Poppins';
+                }}
+                QPushButton:hover {{
+                    background-color: #d0d0d0;
+                }}
+            """
+            )
+            cancel_btn.setMinimumHeight(44)
+            cancel_btn.clicked.connect(dialog.reject)
+            btn_layout.addWidget(cancel_btn)
+
+            send_btn = QPushButton("Enviar")
+            send_btn.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: {SUCCESS_COLOR};
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                    font-family: 'Poppins';
+                }}
+                QPushButton:hover {{
+                    background-color: #047857;
+                }}
+            """
+            )
+            send_btn.setMinimumHeight(44)
+            send_btn.clicked.connect(dialog.accept)
+            btn_layout.addWidget(send_btn)
+
+            layout.addLayout(btn_layout)
+            dialog.setLayout(layout)
+
+            # Auto-ajustar tamanho
+            dialog.adjustSize()
+
+            # Centralizar na tela
+            dialog.move(
+                self.geometry().center().x() - dialog.width() // 2,
+                self.geometry().center().y() - dialog.height() // 2,
+            )
+
+            if dialog.exec() == QDialog.DialogCode.Accepted:
+                recipient_email = email_input.text().strip()
+
+                # Validar email simples
+                if "@" not in recipient_email or "." not in recipient_email:
+                    QMessageBox.warning(self, "Erro", "Email inválido!")
+                    return
+
+                try:
+                    # Gerar PDF em arquivo temporário
+                    pdf_gen = PDFGenerator()
+                    with tempfile.NamedTemporaryFile(
+                        suffix=".pdf", delete=False
+                    ) as tmp_file:
+                        pdf_path = tmp_file.name
+
+                    pdf_gen.generate_prontuario(record, pdf_path)
+
+                    # Enviar email
+                    sender = EmailSender()
+                    success, message = sender.send_prontuario(
+                        recipient_email,
+                        record.get("patient_name", "Paciente"),
+                        pdf_path,
+                    )
+
+                    if success:
+                        QMessageBox.information(self, "Sucesso", message)
+                    else:
+                        QMessageBox.critical(self, "Erro", message)
+
+                    # Limpar arquivo temporário
+                    import os
+
+                    try:
+                        os.unlink(pdf_path)
+                    except:
+                        pass
+
+                except Exception as e:
+                    import traceback
+
+                    error_msg = f"{str(e)}\n\n{traceback.format_exc()}"
+                    QMessageBox.critical(self, "Erro ao enviar email", error_msg)
+
+        except Exception as e:
+            QMessageBox.critical(
+                self,
+                "Erro",
+                f"Erro ao enviar email:\n{str(e)}",
             )
 
     def show_history_details(self, index):
@@ -1461,17 +1722,31 @@ class ExpertSystemApp(QMainWindow):
         rl.setSpacing(10)
         rl.setContentsMargins(0, 0, 0, 0)
 
-        resp_title = QLabel("Respostas do Paciente")
+        resp_title = QLabel("Respostas do Paciente - Acordeons por Eixo")
         resp_title.setStyleSheet(
             f"color: {DARK_TEXT}; font-size: 15px; font-weight: 700; font-family: 'Poppins';"
         )
         rl.addWidget(resp_title)
         rl.addSpacing(4)
 
-        # Usar o novo componente de respostas
-        if record.get("responses"):
-            responses_list = ResponsesListWidget(record["responses"])
-            rl.addWidget(responses_list)
+        # Usar o componente de acordeons para histórico
+        if record.get("responses") or record.get("id"):
+            # Se tem ID, buscar respostas do BD
+            if record.get("id"):
+                eixos_nomes = [
+                    "Eixo 1 — Comportamento Alimentar",
+                    "Eixo 2 — Imagem Corporal",
+                    "Eixo 3 — Emoção e Autoconceito",
+                    "Eixo 4 — Controle e Rotina",
+                    "Eixo 5 — Percepção do Problema",
+                ]
+                accordion_widget = AccordionWidget(
+                    self.db, eixos_nomes, avaliacao_id=record.get("id")
+                )
+                rl.addWidget(accordion_widget)
+            else:
+                responses_list = ResponsesListWidget(record["responses"])
+                rl.addWidget(responses_list)
         else:
             empty = QLabel("Sem respostas registradas.")
             empty.setStyleSheet(f"color: {SECONDARY_TEXT}; font-size: 13px;")
@@ -1509,6 +1784,14 @@ class ExpertSystemApp(QMainWindow):
         pdf_btn.setMinimumHeight(44)
         pdf_btn.clicked.connect(lambda: self.export_to_pdf(record))
         actions.addWidget(pdf_btn, 0, Qt.AlignmentFlag.AlignCenter)
+
+        actions.addSpacing(16)
+
+        email_btn = ModernButton("Enviar por Email", SUCCESS_COLOR)
+        email_btn.setMaximumWidth(200)
+        email_btn.setMinimumHeight(44)
+        email_btn.clicked.connect(lambda: self.send_via_email(record))
+        actions.addWidget(email_btn, 0, Qt.AlignmentFlag.AlignCenter)
 
         actions.addStretch(1)
         main_layout.addLayout(actions)

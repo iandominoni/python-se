@@ -7,7 +7,7 @@ a = Analysis(
     binaries=[],
     datas=[
         ('questions.json', '.'),
-        ('history_cache.json', '.'),
+        ('../.env', '.'),  # Incluir arquivo .env na build
     ],
     hiddenimports=[
         'PyQt6.QtWidgets',
@@ -20,6 +20,7 @@ a = Analysis(
         'reportlab.lib.units',
         'reportlab.platypus',
         'reportlab.pdfgen',
+        'dotenv',  # Adicionar dotenv ao hidden imports
     ],
     hookspath=[],
     hooksconfig={},

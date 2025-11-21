@@ -1,10 +1,12 @@
 """
 Módulo de gerenciamento de dados (perguntas e histórico).
+Agora usa SQLite para persistência de respostas.
 """
 
 import os
 import sys
 import json
+from db import Database
 
 
 def load_questions():
@@ -109,58 +111,51 @@ class QuestionManager:
 
 
 class HistoryManager:
-    """Gerencia o histórico de avaliações com cache em arquivo."""
+    """Gerencia o histórico de avaliações usando SQLite."""
 
     def __init__(self):
-        self.history = []
-        self.cache_file = self._get_cache_path()
-        self._load_from_cache()
-
-    def _get_cache_path(self):
-        """Retorna o caminho do arquivo de cache."""
-        if getattr(sys, "frozen", False):
-            # Se for executável PyInstaller, salva no diretório do executável
-            base_path = os.path.dirname(sys.executable)
-        else:
-            # Modo desenvolvimento
-            base_path = os.path.dirname(os.path.abspath(__file__))
-
-        return os.path.join(base_path, "history_cache.json")
-
-    def _load_from_cache(self):
-        """Carrega o histórico do arquivo de cache com limite de registros."""
-        try:
-            if os.path.exists(self.cache_file):
-                with open(self.cache_file, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    # Manter apenas os últimos 100 registros para performance
-                    self.history = data[-100:] if len(data) > 100 else data
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.history = []
-
-    def _save_to_cache(self):
-        """Salva o histórico no arquivo de cache."""
-        try:
-            with open(self.cache_file, "w", encoding="utf-8") as f:
-                json.dump(self.history, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"Erro ao salvar cache: {e}")
+        self.db = Database()
 
     def add_assessment(self, assessment_data):
-        """Adiciona uma avaliação ao histórico e salva no cache."""
-        self.history.append(assessment_data)
-        self._save_to_cache()
+        """
+        Adiciona uma avaliação ao banco de dados.
+
+        Args:
+            assessment_data: Dicionário com:
+                - patient_name: Nome do paciente
+                - level: Nível de risco
+                - score: Pontuação
+                - responses: Lista de respostas
+                - data: Data/hora da avaliação
+        """
+        # Salvar avaliação + respostas atomicamente
+        return self.db.save_avaliacao_with_respostas(
+            nome_paciente=assessment_data["patient_name"],
+            nivel_risco=assessment_data["level"],
+            pontuacao=assessment_data["score"],
+            respostas=assessment_data["responses"],
+        )
 
     def get_assessment(self, index):
-        """Retorna uma avaliação específica."""
-        if 0 <= index < len(self.history):
-            return self.history[index]
+        """Retorna uma avaliação específica (ordenada por índice reverso)."""
+        avaliacoes = self.db.get_avaliacoes()
+        if 0 <= index < len(avaliacoes):
+            avaliacao = avaliacoes[index]
+            # Adicionar respostas
+            respostas = self.db.get_respostas_avaliacao(avaliacao["id"])
+            # Renomear 'eixo' para 'eixo_nome' para compatibilidade com PDF generator
+            for resp in respostas:
+                if "eixo" in resp and "eixo_nome" not in resp:
+                    resp["eixo_nome"] = resp.pop("eixo")
+            avaliacao["responses"] = respostas
+            # 'data' já vem formatada do db.get_avaliacoes()
+            return avaliacao
         return None
 
     def get_all(self):
         """Retorna todas as avaliações."""
-        return self.history
+        return self.db.get_avaliacoes()
 
     def get_count(self):
         """Retorna o número de avaliações."""
-        return len(self.history)
+        return self.db.get_total_avaliacoes()

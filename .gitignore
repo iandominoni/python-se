@@ -26,3 +26,12 @@ Thumbs.db
 
 .vscode/
 history_cache.json
+
+# Environment variables (SENSÍVEL - NÃO FAZER COMMIT)
+.env
+.env.local
+.env.*.local
+
+# Banco de dados local
+app/.app_pythonse/
+app/dbhistory.db

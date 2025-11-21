@@ -11,8 +11,42 @@ from reportlab.platypus import (
 )
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
+from reportlab.pdfgen import canvas
 from datetime import datetime
 import os
+
+
+class WatermarkCanvas(canvas.Canvas):
+    """Canvas customizado para adicionar marca d'água em todas as páginas."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page_num = 0
+
+    def showPage(self):
+        """Adiciona marca d'água antes de mostrar a página."""
+        self.page_num += 1
+        self._add_watermark()
+        super().showPage()
+
+    def _add_watermark(self):
+        """Adiciona marca d'água com texto diagonal e 30% opacidade."""
+        width, height = self._pagesize
+
+        # Salvar estado do canvas
+        self.saveState()
+
+        # Configurar transparência 30% (0.30 alpha = 70% opaco)
+        self.setFillAlpha(0.30)
+        self.setFont("Helvetica-Bold", 80)
+
+        # Desenhar texto diagonal no centro
+        self.translate(width / 2, height / 2)
+        self.rotate(45)
+        self.drawCentredString(0, 0, "DOCUMENTO ACADÊMICO")
+
+        # Restaurar estado
+        self.restoreState()
 
 
 class PDFGenerator:
@@ -89,7 +123,7 @@ class PDFGenerator:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             output_path = f"prontuario_{patient_name}_{timestamp}.pdf"
 
-        # Criar documento PDF
+        # Criar documento PDF com canvas customizado
         doc = SimpleDocTemplate(
             output_path,
             pagesize=A4,
@@ -97,10 +131,34 @@ class PDFGenerator:
             leftMargin=0.75 * inch,
             topMargin=0.75 * inch,
             bottomMargin=0.75 * inch,
+            canvasmaker=WatermarkCanvas,
         )
 
         # Lista de elementos para o PDF
         story = []
+
+        # Aviso acadêmico destacado
+        aviso_style = ParagraphStyle(
+            name="AvisoAcademico",
+            parent=self.styles["Normal"],
+            fontSize=11,
+            textColor=colors.red,
+            alignment=TA_CENTER,
+            fontName="Helvetica-Bold",
+            spaceAfter=12,
+            borderColor=colors.red,
+            borderWidth=2,
+            borderPadding=10,
+            backColor=colors.HexColor("#FEE2E2"),
+        )
+
+        story.append(
+            Paragraph(
+                "⚠️ DOCUMENTO ACADÊMICO - APENAS PARA FINS EDUCACIONAIS ⚠️",
+                aviso_style,
+            )
+        )
+        story.append(Spacer(1, 0.1 * inch))
 
         # Título
         story.append(Paragraph("PRONTUÁRIO DE AVALIAÇÃO", self.styles["CustomTitle"]))
@@ -200,12 +258,12 @@ class PDFGenerator:
                 responses_by_eixo[eixo].append(resp)
 
             # Exibir respostas por eixo
+            question_counter = 1  # Contador global para numeração sequencial
             for eixo, eixo_responses in responses_by_eixo.items():
                 story.append(Paragraph(f"<b>{eixo}</b>", self.styles["SectionTitle"]))
 
                 # Criar descrição detalhada para cada questão
                 for resp in eixo_responses:
-                    question_id = resp.get("question_id", "N/A")
                     pergunta_texto = resp.get(
                         "pergunta_texto", "Pergunta não disponível"
                     )
@@ -218,7 +276,7 @@ class PDFGenerator:
 
                     # Criar estilo para questão
                     question_style = ParagraphStyle(
-                        name=f"Question{question_id}",
+                        name=f"Question{question_counter}",
                         parent=self.styles["Normal"],
                         fontSize=10,
                         spaceAfter=8,
@@ -226,16 +284,16 @@ class PDFGenerator:
                         textColor=colors.black,
                     )
 
-                    # Pergunta
+                    # Pergunta com número sequencial global
                     question_text = Paragraph(
-                        f"<b>Q{question_id:02d}:</b> {pergunta_texto}",
+                        f"<b>Q{question_counter:02d}:</b> {pergunta_texto}",
                         question_style,
                     )
                     story.append(question_text)
 
                     # Resposta com cor
                     answer_style = ParagraphStyle(
-                        name=f"Answer{question_id}",
+                        name=f"Answer{question_counter}",
                         parent=self.styles["Normal"],
                         fontSize=10,
                         spaceAfter=12,
@@ -247,6 +305,8 @@ class PDFGenerator:
                         answer_style,
                     )
                     story.append(answer_text_para)
+
+                    question_counter += 1  # Incrementar para próxima questão
 
                 story.append(Spacer(1, 0.2 * inch))
         else:
@@ -267,7 +327,13 @@ class PDFGenerator:
         )
         story.append(
             Paragraph(
-                "<i>Este documento é confidencial e destina-se apenas ao uso profissional.</i>",
+                "<b>Este documento é um projeto acadêmico e NÃO deve ser utilizado para diagnóstico clínico real.</b>",
+                self.styles["CustomNormal"],
+            )
+        )
+        story.append(
+            Paragraph(
+                "<i>Use apenas para fins educacionais e de pesquisa. Consulte um profissional de saúde credenciado para diagnóstico real.</i>",
                 self.styles["CustomNormal"],
             )
         )
